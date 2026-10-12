@@ -74,6 +74,8 @@ public class DriveCode extends LinearOpMode {
     private DcMotor backRightDrive = null;
     private CRServo servoLeft = null;
     private CRServo servoRight = null;
+    private CRServo intakeServoFirst = null;
+    private CRServo intakeServoSecond = null;
 
     @Override
     public void runOpMode() {
@@ -86,6 +88,8 @@ public class DriveCode extends LinearOpMode {
         backRightDrive = hardwareMap.get(DcMotor.class, "back_right_drive");
         servoLeft = hardwareMap.get(CRServo.class, "servo_left");
         servoRight = hardwareMap.get(CRServo.class, "servo_right");
+        intakeServoFirst = hardwareMap.get(CRServo.class, "intake_first");
+        intakeServoSecond = hardwareMap.get(CRServo.class, "intake_first");
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -133,16 +137,18 @@ public class DriveCode extends LinearOpMode {
             else if (gamepad1.b) yawPower = -1.0;
             double servoPower = 0;
             if(gamepad2.a) servoPower = 1.0;
+            double tempIntakePower = 0;
+            if(gamepad2.x) tempIntakePower = 1.0;
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
-            //**This Code is meant to be here**
             double frontLeftPower  = axialPower + lateralPower + yawPower;
             double frontRightPower = axialPower - lateralPower - yawPower;
             double backLeftPower   = axialPower - lateralPower + yawPower;
             double backRightPower  = axialPower + lateralPower - yawPower;
             double servoLeftPower = servoPower;
             double servoRightPower = -servoPower;
+            double intakePower = tempIntakePower;
 
 
 
@@ -184,6 +190,10 @@ public class DriveCode extends LinearOpMode {
             }
             if(servoRightPower == 1.0){
                 servoRight.setPower(-1.0);
+            }
+            if(intakePower == 1.0){
+                intakeServoFirst.setPower(1.0);
+                intakeServoSecond.setPower(1.0);
             }
 
             // Show the elapsed game time and wheel power.
