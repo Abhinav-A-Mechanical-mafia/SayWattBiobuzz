@@ -75,7 +75,6 @@ public class DriveCode extends LinearOpMode {
     private CRServo servoLeft = null;
     private CRServo servoRight = null;
     private CRServo intakeServoFirst = null;
-    private CRServo intakeServoSecond = null;
 
     @Override
     public void runOpMode() {
@@ -89,7 +88,6 @@ public class DriveCode extends LinearOpMode {
         servoLeft = hardwareMap.get(CRServo.class, "servo_left");
         servoRight = hardwareMap.get(CRServo.class, "servo_right");
         intakeServoFirst = hardwareMap.get(CRServo.class, "intake_first");
-        intakeServoSecond = hardwareMap.get(CRServo.class, "intake_first");
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -193,7 +191,6 @@ public class DriveCode extends LinearOpMode {
             }
             if(intakePower == 1.0){
                 intakeServoFirst.setPower(1.0);
-                intakeServoSecond.setPower(1.0);
             }
 
             // Show the elapsed game time and wheel power.
