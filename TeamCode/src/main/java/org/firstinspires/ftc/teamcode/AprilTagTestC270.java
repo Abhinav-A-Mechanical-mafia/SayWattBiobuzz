@@ -92,8 +92,8 @@ public class AprilTagTestC270 extends LinearOpMode {
     // Windows: open a PowerShell, run:
     // Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -like 'USB*' } | Select-Object FriendlyName, InstanceId
     // and locate the line for your camera. The VID and PID is listed directly in the line.
-    static final int VENDOR_ID_SUNPLUS_INNOVATION_TECHNOLOGY = 0x1BCF;
-    static final int PRODUCT_ID_ARDUCAM_OV5648 = 0x284C;
+    static final int VENDOR_ID_LOGITECH = 0x046D;
+    static final int PRODUCT_ID_LOGITECH_C270 = 0x0825;
 
     @Override
     public void runOpMode() {
@@ -103,8 +103,8 @@ public class AprilTagTestC270 extends LinearOpMode {
         // Quirks have no effect unless the camera you are using matches the specified VID/PID
         CameraCompatibilityManager.getInstance()
                 .addQuirk(
-                        VENDOR_ID_SUNPLUS_INNOVATION_TECHNOLOGY,
-                        PRODUCT_ID_ARDUCAM_OV5648,
+                        VENDOR_ID_LOGITECH,
+                        PRODUCT_ID_LOGITECH_C270,
                         CameraCompatibilityManager.Quirk.AVOID_LIB_USB_RESET_DEVICE);
 
         initAprilTag();
