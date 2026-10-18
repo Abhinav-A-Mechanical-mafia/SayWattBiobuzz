@@ -1,3 +1,11 @@
+## Things We Have to Do
+- Abhinav: Add PID/VID for C270 Camera
+
+
+
+
+
+
 ## TeamCode Module
 
 Welcome!
