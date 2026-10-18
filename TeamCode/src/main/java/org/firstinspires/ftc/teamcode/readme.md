@@ -1,8 +1,7 @@
 ## Things We Have to Do
 - Abhinav: Add PID/VID for C270 Camera
-
-
-
+- BIG THING: Get C270 Camera to locate position and auto aim for turret
+- Figure out how to move turret with servos
 
 
 
