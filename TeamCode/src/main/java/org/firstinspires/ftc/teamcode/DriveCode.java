@@ -1,3 +1,4 @@
+//region
 /* Copyright (c) 2021 FIRST. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -26,6 +27,7 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+//endregion
 
 package org.firstinspires.ftc.teamcode;
 
@@ -34,7 +36,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
+//region
 /*
  * This file contains an example of a Linear "OpMode".
  * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
@@ -62,47 +64,52 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
-
+//endregion
 @TeleOp(name="Basic: Omni Linear OpMode", group="Linear OpMode")
 public class DriveCode extends LinearOpMode {
 
-    // Declare OpMode members for each of the 4 motors.
+    RobotHardware robot = new RobotHardware();
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor frontLeftDrive = null;
-    private DcMotor backLeftDrive = null;
-    private DcMotor frontRightDrive = null;
-    private DcMotor backRightDrive = null;
-    private CRServo servoLeft = null;
-    private CRServo servoRight = null;
-    private CRServo intakeServoFirst = null;
+    //region
+    //    private DcMotor frontLeftDrive = null;
+//    private DcMotor backLeftDrive = null;
+//    private DcMotor frontRightDrive = null;
+//    private DcMotor backRightDrive = null;
+//    private CRServo servoLeft = null;
+//    private CRServo servoRight = null;
+//    private CRServo intakeServoFirst = null;
+    //endregion
 
     @Override
     public void runOpMode() {
+        robot.init(hardwareMap);
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
-        frontLeftDrive = hardwareMap.get(DcMotor.class, "front_left_drive");
-        backLeftDrive = hardwareMap.get(DcMotor.class, "back_left_drive");
-        frontRightDrive = hardwareMap.get(DcMotor.class, "front_right_drive");
-        backRightDrive = hardwareMap.get(DcMotor.class, "back_right_drive");
-        servoLeft = hardwareMap.get(CRServo.class, "servo_left");
-        servoRight = hardwareMap.get(CRServo.class, "servo_right");
-        intakeServoFirst = hardwareMap.get(CRServo.class, "intake_first");
-
-        // ########################################################################################
-        // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
-        // ########################################################################################
-        // Most robots need the motors on one side to be reversed to drive forward.
-        // The motor reversals shown here are for a "direct drive" robot (the wheels turn the same direction as the motor shaft)
-        // If your robot has additional gear reductions or uses a right-angled drive, it's important to ensure
-        // that your motors are turning in the correct direction.  So, start out with the reversals here, BUT
-        // when you first test your robot, push the left joystick forward and observe the direction the wheels turn.
-        // Reverse the direction (flip FORWARD <-> REVERSE ) of any wheel that runs backward
-        // Keep testing until ALL the wheels move the robot forward when you push the left joystick forward.
-        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
-        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
+//region
+//        frontLeftDrive = hardwareMap.get(DcMotor.class, "front_left_drive");
+//        backLeftDrive = hardwareMap.get(DcMotor.class, "back_left_drive");
+//        frontRightDrive = hardwareMap.get(DcMotor.class, "front_right_drive");
+//        backRightDrive = hardwareMap.get(DcMotor.class, "back_right_drive");
+//        servoLeft = hardwareMap.get(CRServo.class, "servo_left");
+//        servoRight = hardwareMap.get(CRServo.class, "servo_right");
+//        intakeServoFirst = hardwareMap.get(CRServo.class, "intake_first");
+//
+//        // ########################################################################################
+//        // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
+//        // ########################################################################################
+//        // Most robots need the motors on one side to be reversed to drive forward.
+//        // The motor reversals shown here are for a "direct drive" robot (the wheels turn the same direction as the motor shaft)
+//        // If your robot has additional gear reductions or uses a right-angled drive, it's important to ensure
+//        // that your motors are turning in the correct direction.  So, start out with the reversals here, BUT
+//        // when you first test your robot, push the left joystick forward and observe the direction the wheels turn.
+//        // Reverse the direction (flip FORWARD <-> REVERSE ) of any wheel that runs backward
+//        // Keep testing until ALL the wheels move the robot forward when you push the left joystick forward.
+//        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+//        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+//        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
+//        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
+//endregion
 
 
         // Wait for the game to start (driver presses START)
@@ -179,18 +186,18 @@ public class DriveCode extends LinearOpMode {
             */
 
             // Send calculated power to wheels
-            frontLeftDrive.setPower(frontLeftPower);
-            frontRightDrive.setPower(frontRightPower);
-            backLeftDrive.setPower(backLeftPower);
-            backRightDrive.setPower(backRightPower);
+            robot.frontLeftDrive.setPower(frontLeftPower);
+            robot.frontRightDrive.setPower(frontRightPower);
+            robot.backLeftDrive.setPower(backLeftPower);
+            robot.backRightDrive.setPower(backRightPower);
             if(servoLeftPower == 1.0){
-                servoLeft.setPower(1.0);
+                robot.servoLeft.setPower(1.0);
             }
             if(servoRightPower == 1.0){
-                servoRight.setPower(-1.0);
+                robot.servoRight.setPower(-1.0);
             }
             if(intakePower == 1.0){
-                intakeServoFirst.setPower(1.0);
+                robot.intakeServoFirst.setPower(1.0);
             }
 
             // Show the elapsed game time and wheel power.
