@@ -74,7 +74,7 @@ public class SensorHuskyLensTest extends LinearOpMode {
     public void runOpMode() {
         double CENTER_X = 160.0;
         double TAG_WIDTH = 3.25; //in inches
-        double FOCAL_LENGTH = 200.0; // (block.width (in px) + Distance (inches))/3.25(april tag width)
+        double FOCAL_LENGTH = 320.4; // (block.width (in px) + Distance (inches))/3.25(april tag width)
         huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
 
         //region
@@ -150,7 +150,7 @@ public class SensorHuskyLensTest extends LinearOpMode {
 
             for (HuskyLens.Block block : blocks) {
 
-                if (block.id >= 30 &&
+                if (block.id >= 1 && //block id has to be manually set inside husky lens!!!!!
                         block.id <= 45 &&
                         block.width > 0) {
 

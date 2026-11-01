@@ -66,7 +66,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 //endregion
-@TeleOp(name="Basic: Omni Linear OpMode", group="Linear OpMode")
+@TeleOp(name="Test Drive Mode", group="Linear OpMode")
 public class TestDriveCode extends LinearOpMode {
 
     RobotHardware robot = new RobotHardware();
@@ -106,10 +106,10 @@ public class TestDriveCode extends LinearOpMode {
 //        // when you first test your robot, push the left joystick forward and observe the direction the wheels turn.
 //        // Reverse the direction (flip FORWARD <-> REVERSE ) of any wheel that runs backward
 //        // Keep testing until ALL the wheels move the robot forward when you push the left joystick forward.
-//        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-//        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-//        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
-//        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
 //endregion
 
 
@@ -142,7 +142,11 @@ public class TestDriveCode extends LinearOpMode {
             if (gamepad1.x) yawPower = 1.0;
             else if (gamepad1.b) yawPower = -1.0;
             double servoPower = 0;
-            if(gamepad2.a) servoPower = 1.0;
+            if(gamepad2.a){
+                servoPower = 1.0;
+            }else{
+                servoPower = 0;
+            }
             double tempIntakePower = 0;
             if(gamepad2.x) tempIntakePower = 1.0;
 
@@ -153,7 +157,7 @@ public class TestDriveCode extends LinearOpMode {
             double backLeftPower   = axialPower - lateralPower + yawPower;
             double backRightPower  = axialPower + lateralPower - yawPower;
             double servoLeftPower = servoPower;
-            double servoRightPower = -servoPower;
+            double servoRightPower = servoPower;
             double intakePower = tempIntakePower;
 
 
@@ -192,10 +196,10 @@ public class TestDriveCode extends LinearOpMode {
             backLeftDrive.setPower(backLeftPower);
             backRightDrive.setPower(backRightPower);
             if(servoLeftPower == 1.0){
-                servoLeft.setPower(1.0);
+                servoLeft.setPower(-1.0);
             }
             if(servoRightPower == 1.0){
-                servoRight.setPower(-1.0);
+                servoRight.setPower(1.0);
             }
             if(intakePower == 1.0){
                 intakeServoFirst.setPower(1.0);
