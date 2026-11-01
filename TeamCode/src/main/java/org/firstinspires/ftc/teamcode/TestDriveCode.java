@@ -35,6 +35,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 //region
@@ -69,7 +70,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name="Test Drive Mode", group="Linear OpMode")
 public class TestDriveCode extends LinearOpMode {
 
-    RobotHardware robot = new RobotHardware();
     private ElapsedTime runtime = new ElapsedTime();
     //region
         private DcMotor frontLeftDrive = null;
@@ -79,11 +79,11 @@ public class TestDriveCode extends LinearOpMode {
     private CRServo servoLeft = null;
     private CRServo servoRight = null;
     private CRServo intakeServoFirst = null;
+    private DcMotor intakeMotorSecond = null;
     //endregion
 
     @Override
     public void runOpMode() {
-        robot.init(hardwareMap);
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
@@ -95,6 +95,7 @@ public class TestDriveCode extends LinearOpMode {
         servoLeft = hardwareMap.get(CRServo.class, "servo_left");
         servoRight = hardwareMap.get(CRServo.class, "servo_right");
         intakeServoFirst = hardwareMap.get(CRServo.class, "intake_first");
+        intakeMotorSecond = hardwareMap.get(DcMotor.class, "intake_second");
 //
 //        // ########################################################################################
 //        // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -110,6 +111,7 @@ public class TestDriveCode extends LinearOpMode {
         backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
         backRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        intakeMotorSecond.setDirection(DcMotorSimple.Direction.FORWARD);
 //endregion
 
 
@@ -147,8 +149,18 @@ public class TestDriveCode extends LinearOpMode {
             }else{
                 servoPower = 0;
             }
-            double tempIntakePower = 0;
-            if(gamepad2.x) tempIntakePower = 1.0;
+            double IntakeFirstPower = 0;
+            double IntakeSecondPower = 0;
+            if(gamepad2.dpad_up){
+                IntakeFirstPower = 1.0;
+            }else {
+                IntakeFirstPower = 0;
+            }
+            if(gamepad2.dpad_down){
+                IntakeSecondPower = 1.0;
+            }else {
+                IntakeSecondPower = 0;
+            }
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
@@ -156,9 +168,6 @@ public class TestDriveCode extends LinearOpMode {
             double frontRightPower = axialPower - lateralPower - yawPower;
             double backLeftPower   = axialPower - lateralPower + yawPower;
             double backRightPower  = axialPower + lateralPower - yawPower;
-            double servoLeftPower = servoPower;
-            double servoRightPower = servoPower;
-            double intakePower = tempIntakePower;
 
 
 
@@ -195,15 +204,10 @@ public class TestDriveCode extends LinearOpMode {
             frontRightDrive.setPower(frontRightPower);
             backLeftDrive.setPower(backLeftPower);
             backRightDrive.setPower(backRightPower);
-            if(servoLeftPower == 1.0){
-                servoLeft.setPower(-1.0);
-            }
-            if(servoRightPower == 1.0){
-                servoRight.setPower(1.0);
-            }
-            if(intakePower == 1.0){
-                intakeServoFirst.setPower(1.0);
-            }
+            servoLeft.setPower(-servoPower);
+            servoRight.setPower(servoPower);
+            intakeServoFirst.setPower(IntakeFirstPower);
+            intakeMotorSecond.setPower(IntakeSecondPower);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
