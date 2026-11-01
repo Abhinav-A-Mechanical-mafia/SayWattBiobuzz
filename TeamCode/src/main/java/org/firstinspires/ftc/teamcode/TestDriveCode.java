@@ -112,6 +112,13 @@ public class TestDriveCode extends LinearOpMode {
         frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
         backRightDrive.setDirection(DcMotor.Direction.FORWARD);
         intakeMotorSecond.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        //Below makes sure that the robot brakes when the motor power is 0 instead of moving a bit
+
+        frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //endregion
 
 
@@ -141,8 +148,9 @@ public class TestDriveCode extends LinearOpMode {
             else if (gamepad1.dpad_left) lateralPower = -1.0;
 
             double yawPower = 0;
-            if (gamepad1.x) yawPower = 1.0;
-            else if (gamepad1.b) yawPower = -1.0;
+            if (gamepad1.b) yawPower = 1.0;
+
+            else if (gamepad1.x) yawPower = -1.0;
             double servoPower = 0;
             if(gamepad2.a){
                 servoPower = 1.0;
@@ -151,12 +159,12 @@ public class TestDriveCode extends LinearOpMode {
             }
             double IntakeFirstPower = 0;
             double IntakeSecondPower = 0;
-            if(gamepad2.dpad_up){
+            if(gamepad2.x){
                 IntakeFirstPower = 1.0;
             }else {
                 IntakeFirstPower = 0;
             }
-            if(gamepad2.dpad_down){
+            if(gamepad2.b){
                 IntakeSecondPower = 1.0;
             }else {
                 IntakeSecondPower = 0;
@@ -206,7 +214,7 @@ public class TestDriveCode extends LinearOpMode {
             backRightDrive.setPower(backRightPower);
             servoLeft.setPower(-servoPower);
             servoRight.setPower(servoPower);
-            intakeServoFirst.setPower(IntakeFirstPower);
+            intakeServoFirst.setPower(-IntakeFirstPower);
             intakeMotorSecond.setPower(IntakeSecondPower);
 
             // Show the elapsed game time and wheel power.
