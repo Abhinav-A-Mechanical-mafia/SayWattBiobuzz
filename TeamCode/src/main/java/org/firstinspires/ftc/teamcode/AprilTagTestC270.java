@@ -79,7 +79,7 @@ public class AprilTagTestC270 extends LinearOpMode {
      * The variable to store our instance of the vision portal.
      */
     private VisionPortal visionPortal;
-
+    //region
     // To find the VID/PID for a camera:
     //
     // Linux: open a terminal, run "lsusb", locate the line for your camera,
@@ -92,6 +92,7 @@ public class AprilTagTestC270 extends LinearOpMode {
     // Windows: open a PowerShell, run:
     // Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -like 'USB*' } | Select-Object FriendlyName, InstanceId
     // and locate the line for your camera. The VID and PID is listed directly in the line.
+    //endregion
     static final int VENDOR_ID_LOGITECH = 0x046D;
     static final int PRODUCT_ID_LOGITECH_C270 = 0x0825;
 
