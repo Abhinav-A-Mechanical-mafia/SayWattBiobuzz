@@ -73,8 +73,8 @@ public class SensorHuskyLensTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         double CENTER_X = 160.0;
-        double TAG_WIDTH = 3.25;
-        double FOCAL_LENGTH = 200.0;
+        double TAG_WIDTH = 3.25; //in inches
+        double FOCAL_LENGTH = 200.0; // (block.width (in px) + Distance (inches))/3.25(april tag width)
         huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
 
         //region
