@@ -65,7 +65,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @Autonomous(name="Robot: Auto Drive By Encoder", group="Robot")
-@Disabled
 public class TestRobotAuto extends LinearOpMode {
 
     /* Declare OpMode members. */
@@ -78,7 +77,7 @@ public class TestRobotAuto extends LinearOpMode {
     private CRServo servoLeft = null;
     private CRServo servoRight = null;
     private DcMotor intakeMotorFirst = null;
-    private HuskyLens huskyLens;
+    //private HuskyLens huskyLens;
     // Calculate the COUNTS_PER_INCH for your specific drive train.
     // Go to your motor vendor website to determine your motor's COUNTS_PER_MOTOR_REV
     // For external drive gearing, set DRIVE_GEAR_REDUCTION as needed.
@@ -109,12 +108,12 @@ public class TestRobotAuto extends LinearOpMode {
         servoLeft = hardwareMap.get(CRServo.class, "servo_left");
         servoRight = hardwareMap.get(CRServo.class, "servo_right");
         intakeMotorFirst = hardwareMap.get(DcMotor.class, "intake_first");
-        huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
+        //huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
         frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
         backRightDrive.setDirection(DcMotor.Direction.FORWARD);
