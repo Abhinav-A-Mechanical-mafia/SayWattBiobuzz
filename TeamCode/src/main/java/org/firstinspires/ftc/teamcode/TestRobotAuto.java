@@ -180,8 +180,8 @@ public class TestRobotAuto extends LinearOpMode {
             newRightTarget = (frontRightDrive.getCurrentPosition() + backRightDrive.getCurrentPosition())/2 + (int)(rightInches * COUNTS_PER_INCH);
             frontLeftDrive.setTargetPosition(newLeftTarget);
             backLeftDrive.setTargetPosition(newLeftTarget);
-            frontRightDrive.setTargetPosition(newLeftTarget);
-            backRightDrive.setTargetPosition(newLeftTarget);
+            frontRightDrive.setTargetPosition(newRightTarget);
+            backRightDrive.setTargetPosition(newRightTarget);
 
             // Turn On RUN_TO_POSITION
             frontLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
