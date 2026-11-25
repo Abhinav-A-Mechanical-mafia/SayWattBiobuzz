@@ -36,8 +36,11 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDir
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraCompatibilityManager;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagClusterDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.apriltag.AprilTagSingleDetection;
 
 import java.util.List;
 
@@ -79,6 +82,7 @@ public class AprilTagTestC270 extends LinearOpMode {
      * The variable to store our instance of the vision portal.
      */
     private VisionPortal visionPortal;
+    private String targetAlliance;
     //region
     // To find the VID/PID for a camera:
     //
@@ -112,12 +116,16 @@ public class AprilTagTestC270 extends LinearOpMode {
 
         // Wait for the DS start button to be touched.
         telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
-        telemetry.addData(">", "Touch START to start OpMode");
+        telemetry.addData(">", "Press START, then X for Blue or B for Red");
         telemetry.update();
         waitForStart();
 
         while (opModeIsActive()) {
-
+            if (gamepad1.xWasPressed()) {
+                targetAlliance = "BLUE";
+            } else if (gamepad1.bWasPressed()) {
+                targetAlliance = "RED";
+            }
             telemetryAprilTag();
 
             // Push telemetry to the Driver Station.
@@ -213,20 +221,35 @@ public class AprilTagTestC270 extends LinearOpMode {
      */
     private void telemetryAprilTag() {
 
+        VisionPortal.CameraState cameraState = visionPortal.getCameraState();
+        telemetry.addData("Camera", cameraState);
+        if (cameraState != VisionPortal.CameraState.STREAMING) {
+            return;
+        }
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        showScoringTarget(currentDetections);
         telemetry.addData("# AprilTags Detected", currentDetections.size());
 
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
-            if (detection.metadata != null) {
-                telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
-                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
-                telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
-                telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
-            } else {
-                telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
-                telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
+            if (detection instanceof AprilTagSingleDetection) {
+                AprilTagSingleDetection single = (AprilTagSingleDetection) detection;
+                if (single.metadata == null) {
+                    telemetry.addLine(String.format("\n==== (ID %d) Unknown", single.id));
+                    telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", single.center.x, single.center.y));
+                    continue;
+                }
+                telemetry.addLine(String.format("\n==== (ID %d) %s", single.id, single.metadata.name));
+            } else if (detection instanceof AprilTagClusterDetection) {
+                AprilTagClusterDetection cluster = (AprilTagClusterDetection) detection;
+                telemetry.addLine(String.format("\n==== Tag Cluster (%s)", cluster.metadata.name));
             }
+            if (detection.ftcPose == null) {
+                continue;
+            }
+            telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
+            telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
+            telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
         }   // end for() loop
 
         // Add "key" information to telemetry
@@ -235,5 +258,42 @@ public class AprilTagTestC270 extends LinearOpMode {
         telemetry.addLine("RBE = Range, Bearing & Elevation");
 
     }   // end method telemetryAprilTag()
+
+    private void showScoringTarget(List<AprilTagDetection> detections) {
+        if (targetAlliance == null) {
+            telemetry.addLine("Choose alliance: X = Blue, B = Red");
+            return;
+        }
+
+        telemetry.addData("Alliance", targetAlliance);
+        AprilTagClusterDetection target = null;
+        for (AprilTagDetection detection : detections) {
+            if (!(detection instanceof AprilTagClusterDetection) || detection.ftcPose == null) {
+                continue;
+            }
+            AprilTagClusterDetection cluster = (AprilTagClusterDetection) detection;
+            AprilTagPoseFtc pose = cluster.ftcPose;
+            // BIOBUZZ cells are scorable when their cluster appears upright.
+            if (!cluster.metadata.name.startsWith(targetAlliance)
+                    || !(Math.abs(pose.roll) < 90)
+                    || !(pose.y > 0)
+                    || !Double.isFinite(pose.range)
+                    || !Double.isFinite(pose.bearing)) {
+                continue;
+            }
+            if (target == null || pose.range < target.ftcPose.range) {
+                target = cluster;
+            }
+        }
+
+        if (target == null) {
+            telemetry.addData("Aim target", "No upright cell for this alliance");
+            return;
+        }
+
+        telemetry.addData("Aim target", target.metadata.name);
+        telemetry.addData("Opening bearing (deg)", "%+.1f", target.ftcPose.bearing);
+        telemetry.addData("Opening range (in)", "%.1f", target.ftcPose.range);
+    }
 
 }   // end class

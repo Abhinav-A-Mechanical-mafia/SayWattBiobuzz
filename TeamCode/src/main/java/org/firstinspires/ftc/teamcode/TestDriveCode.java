@@ -72,17 +72,20 @@ public class TestDriveCode extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
     //region
-        private DcMotor frontLeftDrive = null;
+    private DcMotor frontLeftDrive = null;
     private DcMotor backLeftDrive = null;
     private DcMotor frontRightDrive = null;
     private DcMotor backRightDrive = null;
     private CRServo servoLeft = null;
     private CRServo servoRight = null;
     private DcMotor intakeMotorFirst = null;
+    private DcMotor pollenShooter = null;
+    private CRServo pollenGate = null;
     //endregion
 
     @Override
     public void runOpMode() {
+        double pollenShooterPower = 1.0;
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
@@ -94,6 +97,8 @@ public class TestDriveCode extends LinearOpMode {
         servoLeft = hardwareMap.get(CRServo.class, "servo_left");
         servoRight = hardwareMap.get(CRServo.class, "servo_right");
         intakeMotorFirst = hardwareMap.get(DcMotor.class, "intake_first");
+        pollenShooter = hardwareMap.get(DcMotor.class, "pollen_shooter");
+        pollenGate = hardwareMap.get(CRServo.class, "pollen_gate");
 //
 //        // ########################################################################################
 //        // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -118,12 +123,15 @@ public class TestDriveCode extends LinearOpMode {
         backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMotorFirst.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        pollenShooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //endregion
 
 
         // Wait for the game to start (driver presses START)
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+        boolean previousRightBumper = false;
+        boolean previousLeftBumper = false;
 
         waitForStart();
         runtime.reset();
@@ -162,6 +170,29 @@ public class TestDriveCode extends LinearOpMode {
             }else {
                 IntakeFirstPower = 0;
             }
+            double pollenShooterOn = 0;
+            if(gamepad2.y){
+                pollenShooterOn = 1.0;
+            }else{
+                pollenShooterOn = 0;
+            }
+            if (gamepad2.right_bumper && !previousRightBumper) {
+                pollenShooterPower = Math.min(1.0, pollenShooterPower + 0.1);
+            }
+
+            if (gamepad2.left_bumper && !previousLeftBumper) {
+                pollenShooterPower = Math.max(0.0, pollenShooterPower - 0.1);
+            }
+            double pollenAdvance = 0;
+            if(gamepad2.dpad_up){
+                pollenAdvance = -1.0;
+            }else {
+                pollenAdvance = 0;
+            }
+
+            previousRightBumper = gamepad2.right_bumper;
+            previousLeftBumper = gamepad2.left_bumper;
+
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
@@ -215,11 +246,18 @@ public class TestDriveCode extends LinearOpMode {
             servoLeft.setPower(-servoPower);
             servoRight.setPower(servoPower);
             intakeMotorFirst.setPower(-IntakeFirstPower);
+            if(pollenShooterOn == 1.0){
+                pollenShooter.setPower(pollenShooterPower);
+            }else if(pollenShooterOn == 0){
+                pollenShooter.setPower(0);
+            }
+            pollenGate.setPower(pollenAdvance);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", frontLeftPower, frontRightPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", backLeftPower, backRightPower);
+            telemetry.addData("Pollen Shooter Power: ", pollenShooterPower);
             telemetry.update();
         }
     }}

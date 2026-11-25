@@ -72,9 +72,9 @@ public class SensorHuskyLensTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        double CENTER_X = 160.0;
-        double TAG_WIDTH = 3.25; //in inches
-        double FOCAL_LENGTH = 320.4; // (block.width (in px) + Distance (inches))/3.25(april tag width)
+        double CENTER_X = HuskyLensTagMath.DEFAULT_CENTER_X_PIXELS;
+        double TAG_WIDTH = HuskyLensTagMath.BIOBUZZ_TAG_WIDTH_INCHES;
+        double FOCAL_LENGTH = HuskyLensTagMath.DEFAULT_FOCAL_LENGTH_PIXELS;
         huskyLens = hardwareMap.get(HuskyLens.class, "huskylens");
 
         //region
@@ -146,43 +146,50 @@ public class SensorHuskyLensTest extends LinearOpMode {
              */
             //endregion
             HuskyLens.Block[] blocks = huskyLens.blocks();
-            boolean found = false;
+            HuskyLens.Block target = null;
+            double closestOffset = Double.POSITIVE_INFINITY;
+            int detectedTags = 0;
 
+            // Unlearned tags still give us a bounding box, so aim using its pixel center.
             for (HuskyLens.Block block : blocks) {
-
-                if (block.id >= 1 && //block id has to be manually set inside husky lens!!!!!
-                        block.id <= 45 &&
-                        block.width > 0) {
-
-                    found = true;
-
-                    double offsetPixels = block.x - CENTER_X;
-                    double distanceInches = (TAG_WIDTH * FOCAL_LENGTH) / block.width;
-                    double angleRadians = Math.atan(offsetPixels / FOCAL_LENGTH);
-                    double angleDegrees = Math.toDegrees(angleRadians);
-                    double offsetInches = offsetPixels * TAG_WIDTH / block.width;
-                    telemetry.addData("AprilTag ID", block.id);
-                    telemetry.addData("Distance (in)", "%.2f", distanceInches);
-                    telemetry.addData("Angle (degrees)", "%.2f", angleDegrees);
-                    telemetry.addData("Offset (in)", "%.2f", offsetInches);
-                    telemetry.addData("X Position", block.x);
-                    telemetry.addData("Tag Width (px)", block.width);
-                    telemetry.addLine("----------------");
+                if (block.width <= 0 || block.height <= 0) {
+                    continue;
+                }
+                detectedTags++;
+                double offset = Math.abs(block.x - CENTER_X);
+                if (target == null || offset < closestOffset
+                        || (offset == closestOffset && block.width > target.width)) {
+                    target = block;
+                    closestOffset = offset;
                 }
             }
 
-            if (!found) {
-                telemetry.addLine("No AprilTags detected");
+            telemetry.addData("Tags detected", detectedTags);
+            if (target == null) {
+                telemetry.addData("Aim target", "No tag in view");
+            } else {
+                double offsetPixels = target.x - CENTER_X;
+                double distanceInches = HuskyLensTagMath.depthFromWidth(TAG_WIDTH, FOCAL_LENGTH, target.width);
+                double slope = HuskyLensTagMath.horizontalSlope(target.x, CENTER_X, FOCAL_LENGTH);
+                double angleDegrees = Math.toDegrees(Math.atan(slope));
+                double offsetInches = slope * distanceInches;
+                telemetry.addData("Aim target", "Closest tag to image center");
+                telemetry.addData("HuskyLens learned ID", target.id == 0 ? "Unlearned" : Integer.toString(target.id));
+                telemetry.addData("Aim offset (px)", "%+.0f", offsetPixels);
+                telemetry.addData("Estimated angle (deg)", "%+.1f", angleDegrees);
+                telemetry.addData("Estimated distance (in)", "%.1f", distanceInches);
+                telemetry.addData("Estimated lateral offset (in)", "%+.1f", offsetInches);
+                telemetry.addData("Tag Width (px)", target.width);
             }
             telemetry.update();
             sleep(50);
             //region
             /*
-             * Here inside the FOR loop, you could save or evaluate specific info for the currently recognized Bounding Box:
+             * HuskyLens reports the following bounding-box fields:
              * - blocks[i].width and blocks[i].height   (size of box, in pixels)
              * - blocks[i].left and blocks[i].top       (edges of box)
              * - blocks[i].x and blocks[i].y            (center location)
-             * - blocks[i].id                           (Color ID)
+             * - blocks[i].id                           (learned ID, or zero for an unlearned tag)
              *
              * These values have Java type int (integer).
              */
